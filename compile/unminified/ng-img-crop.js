@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Friday, February 19th, 2016, 12:34:00 AM
+ * Generated at Friday, March 11th, 2016, 9:35:01 AM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -2796,40 +2796,9 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function ($time
             var storedResultImage;
 
             var updateResultImage = function (scope, force, callback) {
-                if (scope.image !== '' && (!scope.liveView.block || force)) {
-                    var resultImageObj = cropHost.getResultImage();
-                    if (angular.isArray(resultImageObj)) {
-                        resultImage = resultImageObj[0].dataURI;
-                        scope.resultArrayImage = resultImageObj;
-                        console.log(scope.resultArrayImage);
-                    } else var resultImage = resultImageObj.dataURI;
-
-                    var urlCreator = window.URL || window.webkitURL;
-                    if (storedResultImage !== resultImage) {
-                        storedResultImage = resultImage;
-                        scope.resultImage = resultImage;
-                        if (scope.liveView.callback) scope.liveView.callback(resultImage);
-                        if (callback) callback(resultImage);
-                        cropHost.getResultImageDataBlob().then(function (blob) {
-                            scope.resultBlob = blob;
-                            scope.urlBlob = urlCreator.createObjectURL(blob);
-                        });
-
-                        if (scope.resultImage) {
-                            cropHost.getDominantColor(scope.resultImage).then(function (dominantColor) {
-                                scope.dominantColor = dominantColor;
-                            });
-                            cropHost.getPalette(scope.resultImage).then(function (palette) {
-                                scope.paletteColor = palette;
-                            });
-                        }
-
-                        updateAreaCoords(scope);
-                        updateCropject(scope);
-                        scope.onChange({
-                            $dataURI: scope.resultImage
-                        });
-                    }
+                if (scope.image !== '') {
+                    updateAreaCoords(scope);
+                    updateCropject(scope);
                 }
             };
 
