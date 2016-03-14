@@ -59,6 +59,7 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype.getSize = function() {
+        this._size.z = this.zoom;
         return this._size;
     };
 
@@ -298,9 +299,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         var totalDistance = (this._ctx.canvas.width * this._ctx.canvas.width) + (this._ctx.canvas.height * this._ctx.canvas.height);
 
         this.zoom = distance / totalDistance;
-        if(this.zoom > 0.7) {
-            this.zoom = 0.7;
+        if(this.zoom > 2) {
+            this.zoom = 2;
         }
+        this._events.trigger('area-move');
     }     
 
     CropArea.prototype.processMouseMove = function() {};

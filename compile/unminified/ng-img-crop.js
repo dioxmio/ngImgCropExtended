@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Monday, March 14th, 2016, 6:45:59 PM
+ * Generated at Monday, March 14th, 2016, 7:16:06 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -773,6 +773,7 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype.getSize = function() {
+        this._size.z = this.zoom;
         return this._size;
     };
 
@@ -1012,9 +1013,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         var totalDistance = (this._ctx.canvas.width * this._ctx.canvas.width) + (this._ctx.canvas.height * this._ctx.canvas.height);
 
         this.zoom = distance / totalDistance;
-        if(this.zoom > 0.7) {
-            this.zoom = 0.7;
+        if(this.zoom > 2) {
+            this.zoom = 2;
         }
+        this._events.trigger('area-move');
     }     
 
     CropArea.prototype.processMouseMove = function() {};
@@ -2174,7 +2176,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                     pageX, pageY;
 
                 if(isMultitouch(event)) {
-                    console.log("multitouch!!!");
                     theArea.processZoom(e.changedTouches);
                 }else {
                     if (e.type === 'touchmove') {

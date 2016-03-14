@@ -163,7 +163,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                     pageX, pageY;
 
                 if(isMultitouch(event)) {
-                    console.log("multitouch!!!");
                     theArea.processZoom(e.changedTouches);
                 }else {
                     if (e.type === 'touchmove') {
