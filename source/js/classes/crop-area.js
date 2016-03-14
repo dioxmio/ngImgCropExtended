@@ -26,6 +26,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             w: 150,
             h: 150
         };
+
+        this.zoom = 0;
     };
 
     /* GETTERS/SETTERS */
@@ -50,6 +52,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
           w: this._ctx.canvas.width,
           h: this._ctx.canvas.height
         };
+    };
+
+    CropArea.prototype.getZoom = function() {
+        return this.zoom;
     };
 
     CropArea.prototype.getSize = function() {
@@ -281,8 +287,21 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.draw = function() {
         // draw crop area
-        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea);
+        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea, this.zoom);
     };
+
+    CropArea.prototype.processZoom = function(touches) {
+        var first = touches[0];
+        var second = touches[1];
+
+        var distance = ((second.pageX - first.pageX) * (second.pageX - first.pageX)) + ((second.pageY - first.pageY) * (second.pageY - first.pageY));
+        var totalDistance = (this._ctx.canvas.width * this._ctx.canvas.width) + (this._ctx.canvas.height * this._ctx.canvas.height);
+
+        this.zoom = distance / totalDistance;
+        if(this.zoom > 0.7) {
+            this.zoom = 0.7;
+        }
+    }     
 
     CropArea.prototype.processMouseMove = function() {};
 

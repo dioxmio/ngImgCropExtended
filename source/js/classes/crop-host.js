@@ -60,10 +60,11 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+            var width = ctx.canvas.width + theArea.getZoom() * ctx.canvas.width;
+            var height = ctx.canvas.height + theArea.getZoom() * ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(image, 0, 0, width, height);
 
                 ctx.save();
 
@@ -149,18 +150,31 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
+        var isMultitouch = function(event) {
+            if (angular.isDefined(event.changedTouches)) {
+                return event.changedTouches.length >= 2;
+            }
+            return false;
+        }
+
         var onMouseMove = function(e) {
             if (image !== null) {
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
-                if (e.type === 'touchmove') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+
+                if(isMultitouch(event)) {
+                    console.log("multitouch!!!");
+                    theArea.processZoom(e.changedTouches);
+                }else {
+                    if (e.type === 'touchmove') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 }
-                theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 drawScene();
             }
         };
@@ -185,17 +199,21 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
         var onMouseUp = function(e) {
             if (image !== null) {
-                var offset = getElementOffset(ctx.canvas),
-                    pageX, pageY;
-                if (e.type === 'touchend') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+                if(isMultitouch(event)) {
+                    console.log("multitouch UP!!!");
+                }else {
+                    var offset = getElementOffset(ctx.canvas),
+                        pageX, pageY;
+                    if (e.type === 'touchend') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
+                    drawScene();
                 }
-                theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
-                drawScene();
             }
         };
 

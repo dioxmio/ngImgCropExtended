@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Friday, March 11th, 2016, 9:35:01 AM
+ * Generated at Monday, March 14th, 2016, 6:45:59 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -740,6 +740,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             w: 150,
             h: 150
         };
+
+        this.zoom = 0;
     };
 
     /* GETTERS/SETTERS */
@@ -764,6 +766,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
           w: this._ctx.canvas.width,
           h: this._ctx.canvas.height
         };
+    };
+
+    CropArea.prototype.getZoom = function() {
+        return this.zoom;
     };
 
     CropArea.prototype.getSize = function() {
@@ -995,8 +1001,21 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.draw = function() {
         // draw crop area
-        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea);
+        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea, this.zoom);
     };
+
+    CropArea.prototype.processZoom = function(touches) {
+        var first = touches[0];
+        var second = touches[1];
+
+        var distance = ((second.pageX - first.pageX) * (second.pageX - first.pageX)) + ((second.pageY - first.pageY) * (second.pageY - first.pageY));
+        var totalDistance = (this._ctx.canvas.width * this._ctx.canvas.width) + (this._ctx.canvas.height * this._ctx.canvas.height);
+
+        this.zoom = distance / totalDistance;
+        if(this.zoom > 0.7) {
+            this.zoom = 0.7;
+        }
+    }     
 
     CropArea.prototype.processMouseMove = function() {};
 
@@ -1168,8 +1187,11 @@ crop.factory('cropCanvas', [function() {
         };
 
         /* Crop Area */
+        function doZoom(value, zoom) {
+            return value + (value * zoom);
+        }
 
-        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath) {
+        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath, zoom) {
             var xRatio = Math.abs(image.width / ctx.canvas.width),
                 yRatio = Math.abs(image.height / ctx.canvas.height),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
@@ -1182,10 +1204,20 @@ crop.factory('cropCanvas', [function() {
             fnDrawClipPath(ctx, centerCoords, size);
             ctx.stroke();
             ctx.clip();
-
             // draw part of original image
             if (size.w > 0) {
-                ctx.drawImage(image, xLeft * xRatio, yTop * yRatio, Math.abs(size.w * xRatio), Math.abs(size.h * yRatio), xLeft, yTop, Math.abs(size.w), Math.abs(size.h));
+                
+                var x = Math.abs(centerCoords.x - size.w / 2) * xRatio;
+
+                ctx.drawImage(image, 
+                    xLeft * Math.abs(image.width / doZoom(ctx.canvas.width,zoom)),
+                    yTop * Math.abs(image.height / doZoom(ctx.canvas.height,zoom)),  
+                    Math.abs(size.w * xRatio), 
+                    Math.abs(size.h * yRatio),
+                    xLeft,
+                    yTop,
+                    doZoom(Math.abs(size.w),zoom), 
+                    doZoom(Math.abs(size.h),zoom));
             }
 
             ctx.beginPath();
@@ -2039,10 +2071,11 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+            var width = ctx.canvas.width + theArea.getZoom() * ctx.canvas.width;
+            var height = ctx.canvas.height + theArea.getZoom() * ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(image, 0, 0, width, height);
 
                 ctx.save();
 
@@ -2128,18 +2161,31 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
+        var isMultitouch = function(event) {
+            if (angular.isDefined(event.changedTouches)) {
+                return event.changedTouches.length >= 2;
+            }
+            return false;
+        }
+
         var onMouseMove = function(e) {
             if (image !== null) {
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
-                if (e.type === 'touchmove') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+
+                if(isMultitouch(event)) {
+                    console.log("multitouch!!!");
+                    theArea.processZoom(e.changedTouches);
+                }else {
+                    if (e.type === 'touchmove') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 }
-                theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 drawScene();
             }
         };
@@ -2164,17 +2210,21 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
         var onMouseUp = function(e) {
             if (image !== null) {
-                var offset = getElementOffset(ctx.canvas),
-                    pageX, pageY;
-                if (e.type === 'touchend') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+                if(isMultitouch(event)) {
+                    console.log("multitouch UP!!!");
+                }else {
+                    var offset = getElementOffset(ctx.canvas),
+                        pageX, pageY;
+                    if (e.type === 'touchend') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
+                    drawScene();
                 }
-                theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
-                drawScene();
             }
         };
 

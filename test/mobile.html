@@ -50,13 +50,14 @@
         <h3>Coordinates : {{coords}}</h3>
         
     </div>
-
+    <script type="text/javascript" src="touch-emulator.js"></script>
+    <script> TouchEmulator(); </script>
     <script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
     <script type="text/javascript" src="../compile/unminified/ng-img-crop.js"></script>
     <script type="text/javascript">
     angular.module('app', ['ngImgCrop'])
         .controller('Ctrl', function($scope) {
-            $scope.type = 'square';
+            $scope.type = 'circle';
             $scope.imageDataURI = '';
             $scope.dominantColor = [];
             $scope.resBlob = {};

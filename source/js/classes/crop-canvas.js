@@ -162,8 +162,11 @@ crop.factory('cropCanvas', [function() {
         };
 
         /* Crop Area */
+        function doZoom(value, zoom) {
+            return value + (value * zoom);
+        }
 
-        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath) {
+        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath, zoom) {
             var xRatio = Math.abs(image.width / ctx.canvas.width),
                 yRatio = Math.abs(image.height / ctx.canvas.height),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
@@ -176,10 +179,20 @@ crop.factory('cropCanvas', [function() {
             fnDrawClipPath(ctx, centerCoords, size);
             ctx.stroke();
             ctx.clip();
-
             // draw part of original image
             if (size.w > 0) {
-                ctx.drawImage(image, xLeft * xRatio, yTop * yRatio, Math.abs(size.w * xRatio), Math.abs(size.h * yRatio), xLeft, yTop, Math.abs(size.w), Math.abs(size.h));
+                
+                var x = Math.abs(centerCoords.x - size.w / 2) * xRatio;
+
+                ctx.drawImage(image, 
+                    xLeft * Math.abs(image.width / doZoom(ctx.canvas.width,zoom)),
+                    yTop * Math.abs(image.height / doZoom(ctx.canvas.height,zoom)),  
+                    Math.abs(size.w * xRatio), 
+                    Math.abs(size.h * yRatio),
+                    xLeft,
+                    yTop,
+                    doZoom(Math.abs(size.w),zoom), 
+                    doZoom(Math.abs(size.h),zoom));
             }
 
             ctx.beginPath();
