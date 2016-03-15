@@ -116,7 +116,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype.getInitSize = function() {
-        return this._initSize;
+        return this._processSize({
+            w: this._ctx.canvas.width * 2,
+            h: this._ctx.canvas.height * 2
+        });
     };
 
     // return a type string
@@ -290,20 +293,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         // draw crop area
         this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea, this.zoom);
     };
-
-    CropArea.prototype.processZoom = function(touches) {
-        var first = touches[0];
-        var second = touches[1];
-
-        var distance = ((second.pageX - first.pageX) * (second.pageX - first.pageX)) + ((second.pageY - first.pageY) * (second.pageY - first.pageY));
-        var totalDistance = (this._ctx.canvas.width * this._ctx.canvas.width) + (this._ctx.canvas.height * this._ctx.canvas.height);
-
-        this.zoom = distance / totalDistance;
-        if(this.zoom > 2) {
-            this.zoom = 2;
-        }
-        this._events.trigger('area-move');
-    }     
 
     CropArea.prototype.processMouseMove = function() {};
 

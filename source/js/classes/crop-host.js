@@ -117,8 +117,8 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
                 if(undefined !== theArea.getInitSize() ) {
                     theArea.setSize({
-                        w: Math.min(theArea.getInitSize().w, cw / 2),
-                        h: Math.min(theArea.getInitSize().h, ch / 2)
+                        w: theArea.getInitSize().w,
+                        h: theArea.getInitSize().h
                     });
                 } else {
                     theArea.setSize({
@@ -163,7 +163,7 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                     pageX, pageY;
 
                 if(isMultitouch(event)) {
-                    theArea.processZoom(e.changedTouches);
+                    
                 }else {
                     if (e.type === 'touchmove') {
                         pageX = getChangedTouches(e)[0].pageX;
@@ -198,21 +198,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
         var onMouseUp = function(e) {
             if (image !== null) {
-                if(isMultitouch(event)) {
-                    console.log("multitouch UP!!!");
-                }else {
-                    var offset = getElementOffset(ctx.canvas),
-                        pageX, pageY;
-                    if (e.type === 'touchend') {
-                        pageX = getChangedTouches(e)[0].pageX;
-                        pageY = getChangedTouches(e)[0].pageY;
-                    } else {
-                        pageX = e.pageX;
-                        pageY = e.pageY;
-                    }
-                    theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
-                    drawScene();
+                var offset = getElementOffset(ctx.canvas),
+                    pageX, pageY;
+                if (e.type === 'touchend') {
+                    pageX = getChangedTouches(e)[0].pageX;
+                    pageY = getChangedTouches(e)[0].pageY;
+                } else {
+                    pageX = e.pageX;
+                    pageY = e.pageY;
                 }
+                theArea.processMouseUp(pageX - offset.left, pageY - offset.top);
+                drawScene();
             }
         };
 

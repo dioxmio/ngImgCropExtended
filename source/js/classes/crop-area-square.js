@@ -31,6 +31,17 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         return 'square';
     };
 
+    CropArea.prototype.getInitSize = function() {
+        var size = this._ctx.canvas.width;
+        if (size > this._ctx.canvas.height) {
+            size = this._ctx.canvas.height;
+        }
+        return this._processSize({
+            w: size,
+            h: size
+        });
+    };
+
     CropAreaSquare.prototype._calcSquareCorners = function() {
         var size = this.getSize(),
             se = this.getSouthEastBound();
