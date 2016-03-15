@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Tuesday, March 15th, 2016, 3:22:31 PM
+ * Generated at Tuesday, March 15th, 2016, 3:51:48 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -451,7 +451,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         return 'square';
     };
 
-    CropArea.prototype.getInitSize = function() {
+    CropAreaSquare.prototype.getInitSize = function() {
         var size = this._ctx.canvas.width;
         if (size > this._ctx.canvas.height) {
             size = this._ctx.canvas.height;
@@ -842,8 +842,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.getInitSize = function() {
         return this._processSize({
-            w: this._ctx.canvas.width * 2,
-            h: this._ctx.canvas.height * 2
+            w: this._ctx.canvas.width,
+            h: this._ctx.canvas.height
         });
     };
 

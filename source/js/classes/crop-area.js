@@ -117,8 +117,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.getInitSize = function() {
         return this._processSize({
-            w: this._ctx.canvas.width * 2,
-            h: this._ctx.canvas.height * 2
+            w: this._ctx.canvas.width,
+            h: this._ctx.canvas.height
         });
     };
 

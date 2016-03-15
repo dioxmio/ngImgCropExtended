@@ -31,7 +31,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         return 'square';
     };
 
-    CropArea.prototype.getInitSize = function() {
+    CropAreaSquare.prototype.getInitSize = function() {
         var size = this._ctx.canvas.width;
         if (size > this._ctx.canvas.height) {
             size = this._ctx.canvas.height;
