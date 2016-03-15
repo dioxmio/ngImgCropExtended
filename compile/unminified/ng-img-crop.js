@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Friday, March 11th, 2016, 9:35:01 AM
+ * Generated at Tuesday, March 15th, 2016, 7:13:51 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -246,8 +246,8 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius -15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
                 res = i;
                 break;
             }
@@ -451,6 +451,17 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         return 'square';
     };
 
+    CropAreaSquare.prototype.getInitSize = function() {
+        var size = this._ctx.canvas.width;
+        if (size > this._ctx.canvas.height) {
+            size = this._ctx.canvas.height;
+        }
+        return this._processSize({
+            w: size,
+            h: size
+        });
+    };
+
     CropAreaSquare.prototype._calcSquareCorners = function() {
         var size = this.getSize(),
             se = this.getSouthEastBound();
@@ -483,8 +494,8 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius - 15)) {
                 res = i;
                 break;
             }
@@ -740,6 +751,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             w: 150,
             h: 150
         };
+
+        this.zoom = 0;
     };
 
     /* GETTERS/SETTERS */
@@ -766,7 +779,12 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         };
     };
 
+    CropArea.prototype.getZoom = function() {
+        return this.zoom;
+    };
+
     CropArea.prototype.getSize = function() {
+        this._size.z = this.zoom;
         return this._size;
     };
 
@@ -807,8 +825,31 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         };
     };
 
+    CropArea.prototype.filterMargin = function(point, s) {
+        if((point.x - s.w / 2) < 15) {
+            point.x = s.w/2 + 15;
+        }
+
+        if((point.y - s.h/ 2) < 15) {
+            point.y = s.h/2 + 15;
+        }
+
+        if((point.x + s.w/ 2) > this._ctx.canvas.width - 15) {
+            point.x = this._ctx.canvas.width - 15 - s.w/2;
+        }
+
+        if((point.y + s.h/ 2) > this._ctx.canvas.height - 15) {
+            point.y = this._ctx.canvas.height - 15 - s.h/2;
+        }
+
+        return point;
+    }
+
     CropArea.prototype.setCenterPoint = function(point) {
         var s = this.getSize();
+
+        point = this.filterMargin(point, s);
+        
         this.setSize({
             x: point.x - s.w / 2,
             y: point.y - s.h / 2,
@@ -823,7 +864,10 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype.getInitSize = function() {
-        return this._initSize;
+        return this._processSize({
+            w: this._ctx.canvas.width - 30,
+            h: this._ctx.canvas.height - 30
+        });
     };
 
     // return a type string
@@ -834,8 +878,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     /* FUNCTIONS */
     CropArea.prototype._preventBoundaryCollision = function(size) {
-        var canvasH = this._ctx.canvas.height,
-            canvasW = this._ctx.canvas.width;
+        var canvasH = this._ctx.canvas.height - 15,
+            canvasW = this._ctx.canvas.width - 15;
 
         var nw = {
             x: size.x,
@@ -844,11 +888,11 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         var se = this._southEastBound(size);
 
         // check northwest corner
-        if (nw.x < 0) {
-            nw.x = 0;
+        if (nw.x < 15) {
+            nw.x = 15;
         }
-        if (nw.y < 0) {
-            nw.y = 0;
+        if (nw.y < 15) {
+            nw.y = 15;
         }
 
         // check southeast corner
@@ -942,8 +986,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype._dontDragOutside = function() {
-        var h = this._ctx.canvas.height,
-            w = this._ctx.canvas.width;
+        var h = this._ctx.canvas.height - 15,
+            w = this._ctx.canvas.width - 15;
 
         if (this._width > w) {
             this._width = w;
@@ -995,7 +1039,7 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.draw = function() {
         // draw crop area
-        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea);
+        this._cropCanvas.drawCropArea(this._image, this.getCenterPoint(), this._size, this._drawArea, this.zoom);
     };
 
     CropArea.prototype.processMouseMove = function() {};
@@ -1084,13 +1128,13 @@ crop.factory('cropCanvas', [function() {
 
     // Colors
     var colors = {
-        areaOutline: '#fff',
-        resizeBoxStroke: '#fff',
-        resizeBoxFill: '#444',
-        resizeBoxArrowFill: '#fff',
-        resizeCircleStroke: '#fff',
-        resizeCircleFill: '#444',
-        moveIconFill: '#fff'
+        areaOutline: '#0072e1',
+        resizeBoxStroke: '#0072e1',
+        resizeBoxFill: '#fff',
+        resizeBoxArrowFill: '#0072e1',
+        resizeCircleStroke: '#0072e1',
+        resizeCircleFill: '#fff',
+        moveIconFill: '#0072e1'
     };
 
     return function(ctx) {
@@ -1168,13 +1212,15 @@ crop.factory('cropCanvas', [function() {
         };
 
         /* Crop Area */
+        function doZoom(value, zoom) {
+            return value - (value * zoom);
+        }
 
-        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath) {
-            var xRatio = Math.abs(image.width / ctx.canvas.width),
-                yRatio = Math.abs(image.height / ctx.canvas.height),
+        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath, zoom) {
+            var xRatio = Math.abs(image.width / (ctx.canvas.width - 30)),
+                yRatio = Math.abs(image.height / (ctx.canvas.height - 30)),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
                 yTop = Math.abs(centerCoords.y - size.h / 2);
-
             ctx.save();
             ctx.strokeStyle = colors.areaOutline;
             ctx.lineWidth = 2;
@@ -1182,10 +1228,18 @@ crop.factory('cropCanvas', [function() {
             fnDrawClipPath(ctx, centerCoords, size);
             ctx.stroke();
             ctx.clip();
-
             // draw part of original image
             if (size.w > 0) {
-                ctx.drawImage(image, xLeft * xRatio, yTop * yRatio, Math.abs(size.w * xRatio), Math.abs(size.h * yRatio), xLeft, yTop, Math.abs(size.w), Math.abs(size.h));
+                
+                ctx.drawImage(image, 
+                    (xLeft - 15) * xRatio,
+                    (yTop - 15) * yRatio,  
+                    Math.abs((size.w) * xRatio), 
+                    Math.abs((size.h) * yRatio),
+                    xLeft,
+                    yTop,
+                    size.w, 
+                    size.h);
             }
 
             ctx.beginPath();
@@ -2039,16 +2093,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+            var width = ctx.canvas.width;
+            var height = ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(image, 15, 15, width-30, height-30);
 
                 ctx.save();
 
                 // and make it darker
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillRect(15, 15, ctx.canvas.width - 30, ctx.canvas.height - 30);
 
                 ctx.restore();
 
@@ -2095,8 +2150,8 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
                 if(undefined !== theArea.getInitSize() ) {
                     theArea.setSize({
-                        w: Math.min(theArea.getInitSize().w, cw / 2),
-                        h: Math.min(theArea.getInitSize().h, ch / 2)
+                        w: theArea.getInitSize().w,
+                        h: theArea.getInitSize().h
                     });
                 } else {
                     theArea.setSize({
@@ -2128,18 +2183,30 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
+        var isMultitouch = function(event) {
+            if (angular.isDefined(event.changedTouches)) {
+                return event.changedTouches.length >= 2;
+            }
+            return false;
+        }
+
         var onMouseMove = function(e) {
             if (image !== null) {
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
-                if (e.type === 'touchmove') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+
+                if(isMultitouch(event)) {
+                    
+                }else {
+                    if (e.type === 'touchmove') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 }
-                theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 drawScene();
             }
         };

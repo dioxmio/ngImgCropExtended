@@ -77,13 +77,13 @@ crop.factory('cropCanvas', [function() {
 
     // Colors
     var colors = {
-        areaOutline: '#fff',
-        resizeBoxStroke: '#fff',
-        resizeBoxFill: '#444',
-        resizeBoxArrowFill: '#fff',
-        resizeCircleStroke: '#fff',
-        resizeCircleFill: '#444',
-        moveIconFill: '#fff'
+        areaOutline: '#0072e1',
+        resizeBoxStroke: '#0072e1',
+        resizeBoxFill: '#fff',
+        resizeBoxArrowFill: '#0072e1',
+        resizeCircleStroke: '#0072e1',
+        resizeCircleFill: '#fff',
+        moveIconFill: '#0072e1'
     };
 
     return function(ctx) {
@@ -162,13 +162,15 @@ crop.factory('cropCanvas', [function() {
         };
 
         /* Crop Area */
+        function doZoom(value, zoom) {
+            return value - (value * zoom);
+        }
 
-        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath) {
-            var xRatio = Math.abs(image.width / ctx.canvas.width),
-                yRatio = Math.abs(image.height / ctx.canvas.height),
+        this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath, zoom) {
+            var xRatio = Math.abs(image.width / (ctx.canvas.width - 30)),
+                yRatio = Math.abs(image.height / (ctx.canvas.height - 30)),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
                 yTop = Math.abs(centerCoords.y - size.h / 2);
-
             ctx.save();
             ctx.strokeStyle = colors.areaOutline;
             ctx.lineWidth = 2;
@@ -176,10 +178,18 @@ crop.factory('cropCanvas', [function() {
             fnDrawClipPath(ctx, centerCoords, size);
             ctx.stroke();
             ctx.clip();
-
             // draw part of original image
             if (size.w > 0) {
-                ctx.drawImage(image, xLeft * xRatio, yTop * yRatio, Math.abs(size.w * xRatio), Math.abs(size.h * yRatio), xLeft, yTop, Math.abs(size.w), Math.abs(size.h));
+                
+                ctx.drawImage(image, 
+                    (xLeft - 15) * xRatio,
+                    (yTop - 15) * yRatio,  
+                    Math.abs((size.w) * xRatio), 
+                    Math.abs((size.h) * yRatio),
+                    xLeft,
+                    yTop,
+                    size.w, 
+                    size.h);
             }
 
             ctx.beginPath();

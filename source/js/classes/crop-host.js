@@ -60,16 +60,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+            var width = ctx.canvas.width;
+            var height = ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(image, 15, 15, width-30, height-30);
 
                 ctx.save();
 
                 // and make it darker
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillRect(15, 15, ctx.canvas.width - 30, ctx.canvas.height - 30);
 
                 ctx.restore();
 
@@ -116,8 +117,8 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
                 if(undefined !== theArea.getInitSize() ) {
                     theArea.setSize({
-                        w: Math.min(theArea.getInitSize().w, cw / 2),
-                        h: Math.min(theArea.getInitSize().h, ch / 2)
+                        w: theArea.getInitSize().w,
+                        h: theArea.getInitSize().h
                     });
                 } else {
                     theArea.setSize({
@@ -149,18 +150,30 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
+        var isMultitouch = function(event) {
+            if (angular.isDefined(event.changedTouches)) {
+                return event.changedTouches.length >= 2;
+            }
+            return false;
+        }
+
         var onMouseMove = function(e) {
             if (image !== null) {
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
-                if (e.type === 'touchmove') {
-                    pageX = getChangedTouches(e)[0].pageX;
-                    pageY = getChangedTouches(e)[0].pageY;
-                } else {
-                    pageX = e.pageX;
-                    pageY = e.pageY;
+
+                if(isMultitouch(event)) {
+                    
+                }else {
+                    if (e.type === 'touchmove') {
+                        pageX = getChangedTouches(e)[0].pageX;
+                        pageY = getChangedTouches(e)[0].pageY;
+                    } else {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+                    }
+                    theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 }
-                theArea.processMouseMove(pageX - offset.left, pageY - offset.top);
                 drawScene();
             }
         };

@@ -67,8 +67,8 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius -15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
                 res = i;
                 break;
             }

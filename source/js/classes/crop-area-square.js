@@ -31,6 +31,17 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         return 'square';
     };
 
+    CropAreaSquare.prototype.getInitSize = function() {
+        var size = this._ctx.canvas.width;
+        if (size > this._ctx.canvas.height) {
+            size = this._ctx.canvas.height;
+        }
+        return this._processSize({
+            w: size,
+            h: size
+        });
+    };
+
     CropAreaSquare.prototype._calcSquareCorners = function() {
         var size = this.getSize(),
             se = this.getSouthEastBound();
@@ -63,8 +74,8 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius - 15)) {
                 res = i;
                 break;
             }
