@@ -36,11 +36,9 @@
             palette-color="paletteColor"
             palette-color-length="paletteColorLength"
             force-aspect-ratio="true" 
-            area-init-size="'2000'"
             url-blob="urlBlob"
             area-type="{{type}}" 
             area-coords="coords"
-            area-min-size="minSize"
             result-image-size="resImgSize" 
             ></img-crop>
     </div>
@@ -59,17 +57,13 @@
     <script type="text/javascript">
     angular.module('app', ['ngImgCrop'])
         .controller('Ctrl', function($scope) {
-            $scope.type = 'rectangle';
+            $scope.type = 'square';
             $scope.imageDataURI = '';
-            $scope.minSize = 5;
             $scope.dominantColor = [];
             $scope.resBlob = {};
             $scope.urlBlob = {};
             $scope.resImgSize = 200;
-            $scope.initSize = { 
-                w: 800, 
-                h: 800 
-            };
+
             $scope.paletteColor = '';
             $scope.paletteColorLength = 8;
 

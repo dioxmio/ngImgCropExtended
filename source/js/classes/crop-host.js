@@ -150,13 +150,19 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
+        var isMultitouch = function(event) {
+            if (angular.isDefined(event.changedTouches)) {
+                return event.changedTouches.length >= 2;
+            }
+            return false;
+        }
+
         var onMouseMove = function(e) {
             if (image !== null) {
-                theArea.processTouchMove(e.changedTouches);
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
 
-                if(theArea.isMultitouch()) {
+                if(isMultitouch(event)) {
                     theArea.processZoom(e.changedTouches);
                 }else {
                     if (e.type === 'touchmove') {
@@ -176,7 +182,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             e.preventDefault();
             e.stopPropagation();
             if (image !== null) {
-                theArea.processTouchStart(e.changedTouches);
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
                 if (e.type === 'touchstart') {
@@ -193,8 +198,9 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
         var onMouseUp = function(e) {
             if (image !== null) {
-                theArea.processTouchEnd(e.changedTouches);
-                if(!theArea.isMultitouch()) {
+                if(isMultitouch(event)) {
+                    console.log("multitouch UP!!!");
+                }else {
                     var offset = getElementOffset(ctx.canvas),
                         pageX, pageY;
                     if (e.type === 'touchend') {

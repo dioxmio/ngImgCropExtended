@@ -199,16 +199,6 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         return res;
     };
 
-    CropAreaRectangle.prototype.processTouchStart = function(touches) {
-        CropArea.prototype.processTouchStart.call(this, touches);
-        if(this.isMultitouch()) {
-            this._areaIsHover = false;
-            this._resizeCtrlIsHover = -1;
-            this._posDragStartX = 0;
-            this._posDragStartY = 0;
-        }
-    };
-
     CropAreaRectangle.prototype.processMouseDown = function (mouseDownX, mouseDownY) {
         var isWithinResizeCtrl = this._isCoordWithinResizeCtrl([mouseDownX, mouseDownY]);
         if (isWithinResizeCtrl > -1) {

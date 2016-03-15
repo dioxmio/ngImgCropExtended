@@ -27,8 +27,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             h: 150
         };
 
-        this._touch = {};
-
         this.zoom = 0;
     };
 
@@ -312,31 +310,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     CropArea.prototype.processMouseDown = function() {};
 
     CropArea.prototype.processMouseUp = function() {};
-
-    CropArea.prototype.processTouchMove = function(touches) {
-        var self = this;
-        touches.forEach(function(touch) {
-            self._touch[touch.identifier] = touch;
-        });
-    };
-
-    CropArea.prototype.processTouchStart = function(touches) {
-        this._touch[touches[0].identifier] = touches[0];
-    };
-
-    CropArea.prototype.processTouchEnd = function(touches) {
-        var self = this;
-        touches.forEach(function(touch) {
-            delete self._touch[touch.identifier];
-        });
-        if (Object.keys(this._touch).length < 2) {
-            this._multitouch = false;
-        } 
-    };
-
-    CropArea.prototype.isMultitouch = function() {
-        return Object.keys(this._touch).length >= 2;
-    };
 
     return CropArea;
 }]);
