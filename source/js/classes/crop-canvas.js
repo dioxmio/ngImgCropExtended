@@ -77,13 +77,13 @@ crop.factory('cropCanvas', [function() {
 
     // Colors
     var colors = {
-        areaOutline: '#fff',
-        resizeBoxStroke: '#fff',
-        resizeBoxFill: '#444',
-        resizeBoxArrowFill: '#fff',
-        resizeCircleStroke: '#fff',
-        resizeCircleFill: '#444',
-        moveIconFill: '#fff'
+        areaOutline: '#0072e1',
+        resizeBoxStroke: '#0072e1',
+        resizeBoxFill: '#fff',
+        resizeBoxArrowFill: '#0072e1',
+        resizeCircleStroke: '#0072e1',
+        resizeCircleFill: '#fff',
+        moveIconFill: '#0072e1'
     };
 
     return function(ctx) {
@@ -171,7 +171,6 @@ crop.factory('cropCanvas', [function() {
                 yRatio = Math.abs(image.height / ctx.canvas.height),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
                 yTop = Math.abs(centerCoords.y - size.h / 2);
-
             ctx.save();
             ctx.strokeStyle = colors.areaOutline;
             ctx.lineWidth = 2;
@@ -185,10 +184,10 @@ crop.factory('cropCanvas', [function() {
                 var x = Math.abs(centerCoords.x - size.w / 2) * xRatio;
 
                 ctx.drawImage(image, 
-                    xLeft * Math.abs(image.width / doZoom(ctx.canvas.width,zoom)),
-                    yTop * Math.abs(image.height / doZoom(ctx.canvas.height,zoom)),  
-                    Math.abs(size.w * xRatio), 
-                    Math.abs(size.h * yRatio),
+                    (xLeft - 15) * Math.abs(image.width / (ctx.canvas.width - 15)),
+                    (yTop - 15) * Math.abs(image.height / (ctx.canvas.height - 15)),  
+                    Math.abs(size.w * xRatio) - 30, 
+                    Math.abs(size.h * yRatio) - 30,
                     xLeft,
                     yTop,
                     doZoom(Math.abs(size.w),zoom), 

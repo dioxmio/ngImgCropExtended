@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Tuesday, March 15th, 2016, 3:51:48 PM
+ * Generated at Tuesday, March 15th, 2016, 6:03:08 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -246,8 +246,8 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius -15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
                 res = i;
                 break;
             }
@@ -494,8 +494,8 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         var res = -1;
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
-            if (coord[0] > resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius && coord[0] < resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius &&
-                coord[1] > resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius && coord[1] < resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius) {
+            if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius - 15)) {
                 res = i;
                 break;
             }
@@ -825,8 +825,31 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         };
     };
 
+    CropArea.prototype.filterMargin = function(point, s) {
+        if((point.x - s.w / 2) < 15) {
+            point.x = s.w/2 + 15;
+        }
+
+        if((point.y - s.h/ 2) < 15) {
+            point.y = s.h/2 + 15;
+        }
+
+        if((point.x + s.w/ 2) > this._ctx.canvas.width - 15) {
+            point.x = this._ctx.canvas.width - 15 - s.w/2;
+        }
+
+        if((point.y + s.h/ 2) > this._ctx.canvas.height - 15) {
+            point.y = this._ctx.canvas.height - 15 - s.h/2;
+        }
+
+        return point;
+    }
+
     CropArea.prototype.setCenterPoint = function(point) {
         var s = this.getSize();
+
+        point = this.filterMargin(point, s);
+        
         this.setSize({
             x: point.x - s.w / 2,
             y: point.y - s.h / 2,
@@ -842,8 +865,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     CropArea.prototype.getInitSize = function() {
         return this._processSize({
-            w: this._ctx.canvas.width,
-            h: this._ctx.canvas.height
+            w: this._ctx.canvas.width - 30,
+            h: this._ctx.canvas.height - 30
         });
     };
 
@@ -855,8 +878,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
     /* FUNCTIONS */
     CropArea.prototype._preventBoundaryCollision = function(size) {
-        var canvasH = this._ctx.canvas.height,
-            canvasW = this._ctx.canvas.width;
+        var canvasH = this._ctx.canvas.height - 15,
+            canvasW = this._ctx.canvas.width - 15;
 
         var nw = {
             x: size.x,
@@ -865,11 +888,11 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
         var se = this._southEastBound(size);
 
         // check northwest corner
-        if (nw.x < 0) {
-            nw.x = 0;
+        if (nw.x < 15) {
+            nw.x = 15;
         }
-        if (nw.y < 0) {
-            nw.y = 0;
+        if (nw.y < 15) {
+            nw.y = 15;
         }
 
         // check southeast corner
@@ -963,8 +986,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     };
 
     CropArea.prototype._dontDragOutside = function() {
-        var h = this._ctx.canvas.height,
-            w = this._ctx.canvas.width;
+        var h = this._ctx.canvas.height - 15,
+            w = this._ctx.canvas.width - 15;
 
         if (this._width > w) {
             this._width = w;
@@ -1105,13 +1128,13 @@ crop.factory('cropCanvas', [function() {
 
     // Colors
     var colors = {
-        areaOutline: '#fff',
-        resizeBoxStroke: '#fff',
-        resizeBoxFill: '#444',
-        resizeBoxArrowFill: '#fff',
-        resizeCircleStroke: '#fff',
-        resizeCircleFill: '#444',
-        moveIconFill: '#fff'
+        areaOutline: '#0072e1',
+        resizeBoxStroke: '#0072e1',
+        resizeBoxFill: '#fff',
+        resizeBoxArrowFill: '#0072e1',
+        resizeCircleStroke: '#0072e1',
+        resizeCircleFill: '#fff',
+        moveIconFill: '#0072e1'
     };
 
     return function(ctx) {
@@ -1198,7 +1221,6 @@ crop.factory('cropCanvas', [function() {
                 yRatio = Math.abs(image.height / ctx.canvas.height),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
                 yTop = Math.abs(centerCoords.y - size.h / 2);
-
             ctx.save();
             ctx.strokeStyle = colors.areaOutline;
             ctx.lineWidth = 2;
@@ -1212,10 +1234,10 @@ crop.factory('cropCanvas', [function() {
                 var x = Math.abs(centerCoords.x - size.w / 2) * xRatio;
 
                 ctx.drawImage(image, 
-                    xLeft * Math.abs(image.width / doZoom(ctx.canvas.width,zoom)),
-                    yTop * Math.abs(image.height / doZoom(ctx.canvas.height,zoom)),  
-                    Math.abs(size.w * xRatio), 
-                    Math.abs(size.h * yRatio),
+                    (xLeft - 15) * Math.abs(image.width / (ctx.canvas.width - 15)),
+                    (yTop - 15) * Math.abs(image.height / (ctx.canvas.height - 15)),  
+                    Math.abs(size.w * xRatio) - 30, 
+                    Math.abs(size.h * yRatio) - 30,
                     xLeft,
                     yTop,
                     doZoom(Math.abs(size.w),zoom), 
@@ -2073,17 +2095,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            var width = ctx.canvas.width + theArea.getZoom() * ctx.canvas.width;
-            var height = ctx.canvas.height + theArea.getZoom() * ctx.canvas.height;
+            var width = ctx.canvas.width;
+            var height = ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, width, height);
+                ctx.drawImage(image, 15, 15, width-30, height-30);
 
                 ctx.save();
 
                 // and make it darker
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillRect(15, 15, ctx.canvas.width - 30, ctx.canvas.height - 30);
 
                 ctx.restore();
 

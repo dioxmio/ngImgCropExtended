@@ -60,17 +60,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         function drawScene() {
             // clear canvas
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            var width = ctx.canvas.width + theArea.getZoom() * ctx.canvas.width;
-            var height = ctx.canvas.height + theArea.getZoom() * ctx.canvas.height;
+            var width = ctx.canvas.width;
+            var height = ctx.canvas.height;
             if (image !== null) {
                 // draw source image
-                ctx.drawImage(image, 0, 0, width, height);
+                ctx.drawImage(image, 15, 15, width-30, height-30);
 
                 ctx.save();
 
                 // and make it darker
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.fillRect(15, 15, ctx.canvas.width - 30, ctx.canvas.height - 30);
 
                 ctx.restore();
 
