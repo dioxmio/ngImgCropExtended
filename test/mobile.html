@@ -31,15 +31,10 @@
     <div class="cropArea">
         <img-crop 
             image="imageDataURI" 
-            result-blob="resBlob"
-            dominant-color="dominantColor"
-            palette-color="paletteColor"
-            palette-color-length="paletteColorLength"
-            force-aspect-ratio="true" 
             url-blob="urlBlob"
             area-type="{{type}}" 
             area-coords="coords"
-            result-image-size="resImgSize" 
+            init-max-area="true"
             ></img-crop>
     </div>
     <div style="text-align:center">
@@ -57,7 +52,7 @@
     <script type="text/javascript">
     angular.module('app', ['ngImgCrop'])
         .controller('Ctrl', function($scope) {
-            $scope.type = 'square';
+            $scope.type = 'rectangle';
             $scope.imageDataURI = '';
             $scope.dominantColor = [];
             $scope.resBlob = {};

@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Tuesday, March 15th, 2016, 6:03:08 PM
+ * Generated at Tuesday, March 15th, 2016, 7:13:51 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -1213,12 +1213,12 @@ crop.factory('cropCanvas', [function() {
 
         /* Crop Area */
         function doZoom(value, zoom) {
-            return value + (value * zoom);
+            return value - (value * zoom);
         }
 
         this.drawCropArea = function(image, centerCoords, size, fnDrawClipPath, zoom) {
-            var xRatio = Math.abs(image.width / ctx.canvas.width),
-                yRatio = Math.abs(image.height / ctx.canvas.height),
+            var xRatio = Math.abs(image.width / (ctx.canvas.width - 30)),
+                yRatio = Math.abs(image.height / (ctx.canvas.height - 30)),
                 xLeft = Math.abs(centerCoords.x - size.w / 2),
                 yTop = Math.abs(centerCoords.y - size.h / 2);
             ctx.save();
@@ -1231,17 +1231,15 @@ crop.factory('cropCanvas', [function() {
             // draw part of original image
             if (size.w > 0) {
                 
-                var x = Math.abs(centerCoords.x - size.w / 2) * xRatio;
-
                 ctx.drawImage(image, 
-                    (xLeft - 15) * Math.abs(image.width / (ctx.canvas.width - 15)),
-                    (yTop - 15) * Math.abs(image.height / (ctx.canvas.height - 15)),  
-                    Math.abs(size.w * xRatio) - 30, 
-                    Math.abs(size.h * yRatio) - 30,
+                    (xLeft - 15) * xRatio,
+                    (yTop - 15) * yRatio,  
+                    Math.abs((size.w) * xRatio), 
+                    Math.abs((size.h) * yRatio),
                     xLeft,
                     yTop,
-                    doZoom(Math.abs(size.w),zoom), 
-                    doZoom(Math.abs(size.h),zoom));
+                    size.w, 
+                    size.h);
             }
 
             ctx.beginPath();
