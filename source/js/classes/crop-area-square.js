@@ -275,6 +275,17 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         }
     };
 
+    CropAreaSquare.prototype.processTouchStart = function(touches) {
+        CropArea.prototype.processTouchStart.call(this, touches);
+        if(this.isMultitouch()) {
+            this._areaIsDragging = false;
+            this._areaIsHover = false;
+            this._resizeCtrlIsHover = -1;
+            this._posDragStartX = 0;
+            this._posDragStartY = 0;
+        }
+    };
+
     CropAreaSquare.prototype.processMouseUp = function( /*mouseUpX, mouseUpY*/ ) {
         if (this._areaIsDragging) {
             this._areaIsDragging = false;

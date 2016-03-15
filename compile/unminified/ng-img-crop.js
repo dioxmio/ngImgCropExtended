@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Monday, March 14th, 2016, 7:16:06 PM
+ * Generated at Tuesday, March 15th, 2016, 11:46:03 AM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -378,6 +378,16 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         return res;
     };
 
+    CropAreaRectangle.prototype.processTouchStart = function(touches) {
+        CropArea.prototype.processTouchStart.call(this, touches);
+        if(this.isMultitouch()) {
+            this._areaIsHover = false;
+            this._resizeCtrlIsHover = -1;
+            this._posDragStartX = 0;
+            this._posDragStartY = 0;
+        }
+    };
+
     CropAreaRectangle.prototype.processMouseDown = function (mouseDownX, mouseDownY) {
         var isWithinResizeCtrl = this._isCoordWithinResizeCtrl([mouseDownX, mouseDownY]);
         if (isWithinResizeCtrl > -1) {
@@ -695,6 +705,17 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         }
     };
 
+    CropAreaSquare.prototype.processTouchStart = function(touches) {
+        CropArea.prototype.processTouchStart.call(this, touches);
+        if(this.isMultitouch()) {
+            this._areaIsDragging = false;
+            this._areaIsHover = false;
+            this._resizeCtrlIsHover = -1;
+            this._posDragStartX = 0;
+            this._posDragStartY = 0;
+        }
+    };
+
     CropAreaSquare.prototype.processMouseUp = function( /*mouseUpX, mouseUpY*/ ) {
         if (this._areaIsDragging) {
             this._areaIsDragging = false;
@@ -740,6 +761,8 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             w: 150,
             h: 150
         };
+
+        this._touch = {};
 
         this.zoom = 0;
     };
@@ -1024,6 +1047,31 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     CropArea.prototype.processMouseDown = function() {};
 
     CropArea.prototype.processMouseUp = function() {};
+
+    CropArea.prototype.processTouchMove = function(touches) {
+        var self = this;
+        touches.forEach(function(touch) {
+            self._touch[touch.identifier] = touch;
+        });
+    };
+
+    CropArea.prototype.processTouchStart = function(touches) {
+        this._touch[touches[0].identifier] = touches[0];
+    };
+
+    CropArea.prototype.processTouchEnd = function(touches) {
+        var self = this;
+        touches.forEach(function(touch) {
+            delete self._touch[touch.identifier];
+        });
+        if (Object.keys(this._touch).length < 2) {
+            this._multitouch = false;
+        } 
+    };
+
+    CropArea.prototype.isMultitouch = function() {
+        return Object.keys(this._touch).length >= 2;
+    };
 
     return CropArea;
 }]);
@@ -2163,19 +2211,13 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
-        var isMultitouch = function(event) {
-            if (angular.isDefined(event.changedTouches)) {
-                return event.changedTouches.length >= 2;
-            }
-            return false;
-        }
-
         var onMouseMove = function(e) {
             if (image !== null) {
+                theArea.processTouchMove(e.changedTouches);
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
 
-                if(isMultitouch(event)) {
+                if(theArea.isMultitouch()) {
                     theArea.processZoom(e.changedTouches);
                 }else {
                     if (e.type === 'touchmove') {
@@ -2195,6 +2237,7 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             e.preventDefault();
             e.stopPropagation();
             if (image !== null) {
+                theArea.processTouchStart(e.changedTouches);
                 var offset = getElementOffset(ctx.canvas),
                     pageX, pageY;
                 if (e.type === 'touchstart') {
@@ -2211,9 +2254,8 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
         var onMouseUp = function(e) {
             if (image !== null) {
-                if(isMultitouch(event)) {
-                    console.log("multitouch UP!!!");
-                }else {
+                theArea.processTouchEnd(e.changedTouches);
+                if(!theArea.isMultitouch()) {
                     var offset = getElementOffset(ctx.canvas),
                         pageX, pageY;
                     if (e.type === 'touchend') {
