@@ -167,6 +167,9 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             nw.x = 15;
         }
         if (nw.y < 15) {
+            if(this.getType() === 'square') {
+                size.h -= (15 - nw.y);
+            }
             nw.y = 15;
         }
 
@@ -175,6 +178,9 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
             se.x = canvasW
         }
         if (se.y > canvasH) {
+            if(this.getType() === 'square') {
+                size.h -= (se.y - canvasH);
+            }
             se.y = canvasH
         }
 
