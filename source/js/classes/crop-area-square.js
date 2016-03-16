@@ -32,9 +32,9 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     };
 
     CropAreaSquare.prototype.getInitSize = function() {
-        var size = this._ctx.canvas.width;
-        if (size > this._ctx.canvas.height) {
-            size = this._ctx.canvas.height;
+        var size = this._ctx.canvas.width - 30;
+        if (size > (this._ctx.canvas.height - 30)) {
+            size = this._ctx.canvas.height - 30;
         }
         return this._processSize({
             w: size,

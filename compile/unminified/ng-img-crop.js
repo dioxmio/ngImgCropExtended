@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Tuesday, March 15th, 2016, 7:13:51 PM
+ * Generated at Wednesday, March 16th, 2016, 3:31:22 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -247,7 +247,7 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
             if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
-                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius -15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
                 res = i;
                 break;
             }
@@ -452,9 +452,9 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     };
 
     CropAreaSquare.prototype.getInitSize = function() {
-        var size = this._ctx.canvas.width;
-        if (size > this._ctx.canvas.height) {
-            size = this._ctx.canvas.height;
+        var size = this._ctx.canvas.width - 30;
+        if (size > (this._ctx.canvas.height - 30)) {
+            size = this._ctx.canvas.height - 30;
         }
         return this._processSize({
             w: size,
@@ -495,7 +495,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         for (var i = 0, len = resizeIconsCenterCoords.length; i < len; i++) {
             var resizeIconCenterCoords = resizeIconsCenterCoords[i];
             if (coord[0] > (resizeIconCenterCoords[0] - this._resizeCtrlHoverRadius - 15) && coord[0] < (resizeIconCenterCoords[0] + this._resizeCtrlHoverRadius + 15) &&
-                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius - 15)) {
+                coord[1] > (resizeIconCenterCoords[1] - this._resizeCtrlHoverRadius - 15) && coord[1] < (resizeIconCenterCoords[1] + this._resizeCtrlHoverRadius + 15)) {
                 res = i;
                 break;
             }
