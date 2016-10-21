@@ -42,6 +42,11 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
         });
     };
 
+    CropAreaSquare.prototype.isEdited = function() {
+      return !(this._ctx.canvas.width === (this._calcRectangleDimensions().right - this._calcRectangleDimensions().left + 30) &&
+        (this._ctx.canvas.height === this._calcRectangleDimensions().bottom + 30 - this._calcRectangleDimensions().top));
+    };
+
     CropAreaSquare.prototype._calcSquareCorners = function() {
         var size = this.getSize(),
             se = this.getSouthEastBound();

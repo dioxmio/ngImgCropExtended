@@ -5,7 +5,7 @@
  * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Wednesday, May 25th, 2016, 10:24:56 AM
+ * Generated at Friday, October 21st, 2016, 5:47:51 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -378,6 +378,11 @@ crop.factory('cropAreaRectangle', ['cropArea', function (CropArea) {
         return res;
     };
 
+    CropAreaRectangle.prototype.isEdited = function() {
+      return !(this._ctx.canvas.width === (this._calcRectangleDimensions().right - this._calcRectangleDimensions().left + 30) &&
+        (this._ctx.canvas.height === this._calcRectangleDimensions().bottom + 30 - this._calcRectangleDimensions().top));
+    };
+
     CropAreaRectangle.prototype.processMouseDown = function (mouseDownX, mouseDownY) {
         var isWithinResizeCtrl = this._isCoordWithinResizeCtrl([mouseDownX, mouseDownY]);
         if (isWithinResizeCtrl > -1) {
@@ -460,6 +465,11 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
             w: size,
             h: size
         });
+    };
+
+    CropAreaSquare.prototype.isEdited = function() {
+      return !(this._ctx.canvas.width === (this._calcRectangleDimensions().right - this._calcRectangleDimensions().left + 30) &&
+        (this._ctx.canvas.height === this._calcRectangleDimensions().bottom + 30 - this._calcRectangleDimensions().top));
     };
 
     CropAreaSquare.prototype._calcSquareCorners = function() {
@@ -2381,6 +2391,10 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             return theArea.getSize()
         };
 
+        this.isEdited = function() {
+            return theArea.isEdited()
+        };
+
         this.setNewImageSource = function(imageSource) {
             image = null;
             resetCropHost();
@@ -2824,7 +2838,7 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function ($time
             urlBlob: '=?',
             chargement: '=?',
             cropject: '=?',
-
+            edited: '=?',
             changeOnFly: '=?',
             liveView: '=?',
             areaCoords: '=?',
@@ -2921,6 +2935,7 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function ($time
                     scope.onLoadError({});
                 }))
                 .on('area-move area-resize', fnSafeApply(function (scope) {
+                    scope.edited = cropHost.isEdited();
                     if (!!scope.changeOnFly) {
                         updateResultImage(scope);
                     }

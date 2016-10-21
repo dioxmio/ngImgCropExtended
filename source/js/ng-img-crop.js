@@ -11,7 +11,7 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function ($time
             urlBlob: '=?',
             chargement: '=?',
             cropject: '=?',
-
+            edited: '=?',
             changeOnFly: '=?',
             liveView: '=?',
             areaCoords: '=?',
@@ -108,6 +108,7 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function ($time
                     scope.onLoadError({});
                 }))
                 .on('area-move area-resize', fnSafeApply(function (scope) {
+                    scope.edited = cropHost.isEdited();
                     if (!!scope.changeOnFly) {
                         updateResultImage(scope);
                     }

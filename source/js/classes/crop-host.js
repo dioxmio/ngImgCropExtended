@@ -342,6 +342,10 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             return theArea.getSize()
         };
 
+        this.isEdited = function() {
+            return theArea.isEdited()
+        };
+
         this.setNewImageSource = function(imageSource) {
             image = null;
             resetCropHost();
