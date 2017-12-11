@@ -2,10 +2,10 @@
  * ngImgCropExtended v0.5.0
  * https://github.com/CrackerakiUA/ngImgCropExtended/
  *
- * Copyright (c) 2016 undefined
+ * Copyright (c) 2017 undefined
  * License: MIT
  *
- * Generated at Friday, October 21st, 2016, 5:47:51 PM
+ * Generated at Monday, December 11th, 2017, 4:27:46 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -468,8 +468,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     };
 
     CropAreaSquare.prototype.isEdited = function() {
-      return !(this._ctx.canvas.width === (this._calcRectangleDimensions().right - this._calcRectangleDimensions().left + 30) &&
-        (this._ctx.canvas.height === this._calcRectangleDimensions().bottom + 30 - this._calcRectangleDimensions().top));
+      return true;
     };
 
     CropAreaSquare.prototype._calcSquareCorners = function() {
